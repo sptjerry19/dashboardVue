@@ -1,15 +1,23 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <NavbarLeft :show-nav-left="isHidden" />
+  <NavbarTop :show-nav-left="isHidden" @closeNavLeft="(n) => (isHidden = n)" />
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import NavbarTop from "./components/NavbarTop.vue";
+import NavbarLeft from "./components/NavbarLeft.vue";
 
 export default {
   name: "App",
   components: {
-    HelloWorld,
+    NavbarTop,
+    NavbarLeft,
+  },
+  data() {
+    return {
+      count: 1,
+      isHidden: false,
+    };
   },
 };
 </script>
