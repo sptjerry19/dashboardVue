@@ -1,6 +1,14 @@
+<script setup>
+import { useDark, useToggle } from "@vueuse/core";
+const isDark = useDark();
+const toggleDark = useToggle(isDark);
+</script>
 <template>
   <section>
-    <div class="navbar__top bg-gray-200" :class="{ isCloseNavLeft: isHidden }">
+    <div
+      class="navbar__top bg-gray-200 dark:bg-black"
+      :class="{ isCloseNavLeft: isHidden || posX < 1225 }"
+    >
       <div class="navbar__top--logo">
         <i
           class="py-2 px-3 cursor-pointer hover:text-cyan-400"
@@ -12,7 +20,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6"
+            class="w-8 h-8"
           >
             <path
               stroke-linecap="round"
@@ -22,7 +30,7 @@
           </svg>
         </i>
         <img
-          class="w-44 bg-gray-200 text-gray-200"
+          class="w-28 bg-gray-200 text-gray-200"
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Tom_and_Jerry_logo.svg/1280px-Tom_and_Jerry_logo.svg.png"
           alt="logo"
         />
@@ -31,9 +39,12 @@
         <input type="text" placeholder="input your message" />
       </div>
       <div class="navbar__top--options">
-        <p class="px-3 hover:text-cyan-500 cursor-pointer">Notification</p>
+        <p class="notification px-3 hover:text-cyan-500 cursor-pointer">
+          Notification
+        </p>
         <i
-          class="scale p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          class="zoomScreen p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          @click="openFullscreen"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -50,7 +61,8 @@
           </svg>
         </i>
         <i
-          class="language p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          class="language relative p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          @click="openModalLanguage"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -65,9 +77,23 @@
               d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802"
             />
           </svg>
+          <div
+            class="modal_language absolute top-12 right-0 w-40 border-dashed border-2 border-gray-400 rounded-md"
+            :class="{ hidden: isActivelang == false }"
+          >
+            <div
+              v-for="(language, index) in languages"
+              :key="index"
+              class="flex items-center px-3 py-1 bg-purple-200 hover:bg-slate-600 rounded-md"
+            >
+              <i class="w-1/5"><img :src="language.image" alt="anh" /></i>
+              <p class="ml-2 text-base">{{ language.name }}</p>
+            </div>
+          </div>
         </i>
         <i
-          class="squares p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          class="squares p-3 relative hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          @click="openModelSquares"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -82,9 +108,26 @@
               d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
             />
           </svg>
+          <div
+            class="modal__dashboard absolute top-12 right-0 w-60 border-dashed border-2 border-gray-400 rounded-md bg-white p-2 shadow-2xl dark:bg-black"
+            :class="{ hidden: isActiveSquares == false }"
+          >
+            <div class="flex flex-wrap w-64">
+              <button
+                v-for="(square, index) in squares"
+                :key="index"
+                class="w-28 hover:bg-slate-300 rounded-lg px-3 py-1 border border-dashed dark:bg-gray-600 dark:hover:bg-cyan-300"
+              >
+                <font-awesome-icon :icon="['fas', square.icon]" />
+                <h2 class="text-base">{{ square.name }}</h2>
+                <p class="text-sm">{{ square.over }}</p>
+              </button>
+            </div>
+          </div>
         </i>
         <i
           class="night p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
+          @click="toggleDark()"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -100,12 +143,42 @@
             />
           </svg>
         </i>
-        <i class="w-8 cursor-pointer hover:w-9"
+        <i class="w-8 relative cursor-pointer hover:w-9" @click="openSettingAvt"
           ><img
             class="w-full"
             src="https://seeklogo.com/images/J/jerry-logo-CC2BD85246-seeklogo.com.png"
             alt="avatar"
-        /></i>
+          />
+          <div
+            class="modal__settingsAvt absolute top-14 right-0 w-60 bg-white z-50 shadow-md rounded-xl dark:bg-black"
+            :class="{ hidden: isActiveAva == false }"
+          >
+            <div
+              class="flex justify-center py-4 border-b border-solid border-gray-500 items-center"
+            >
+              <img class="w-9 h-9 rounded-md" :src="setAvatars.image" alt="" />
+              <div class="flex flex-col">
+                <h1 class="ml-2">{{ setAvatars.name }}</h1>
+                <p class="ml-2 text-sm">{{ setAvatars.gmail }}</p>
+              </div>
+            </div>
+            <div
+              v-for="seting in setAvatars.listSeting"
+              :key="seting.id"
+              class="flex flex-col"
+            >
+              <div class="flex items-center py-2 px-4 hover:bg-slate-300">
+                <font-awesome-icon :icon="['fas', seting.icon]" />
+                <h2 class="ml-2">{{ seting.nameset }}</h2>
+              </div>
+            </div>
+            <div
+              class="flex bg-teal-500 items-center justify-center rounded-b-xl h-10"
+            >
+              <h1 class="text-white">SIGN OUT</h1>
+            </div>
+          </div>
+        </i>
         <i
           class="setting p-3 hover:bg-cyan-300 cursor-pointer text-2xl rounded-md"
           ><svg
@@ -142,13 +215,140 @@ export default {
   data() {
     return {
       isHidden: false,
+      isActivelang: false,
+      isActiveSquares: false,
+      isActiveSetting: false,
+      isActiveAva: false,
       messages: [],
+      posX: window.innerWidth, // Khởi tạo giá trị posX bằng chiều rộng ban đầu của cửa sổ
+      languages: [
+        {
+          image: "https://kenh14cdn.com/2017/2-1503128133740.png",
+          name: "UK English",
+        },
+        {
+          image:
+            "https://hangkhongmy.vn/wp-content/uploads/2018/08/bi-an-trong-la-co-nuoc-my-1.png",
+          name: "US English",
+        },
+        {
+          image:
+            "https://th.bing.com/th/id/OIP.WiiE2MA4RS46HmLgfsbXdwAAAA?pid=ImgDet&rs=1",
+          name: "Germany",
+        },
+        {
+          image:
+            "https://th.bing.com/th/id/OIP.b8apmr7MEf5KEcBEDBipIAHaFP?pid=ImgDet&rs=1",
+          name: "Hindi",
+        },
+        {
+          image: "https://www.welt-flaggen.de/data/flags/w1600/ae.png",
+          name: "Saudi Arabia",
+        },
+      ],
+      squares: [
+        {
+          icon: "dashboard",
+          name: "Dashboard",
+          over: "view all",
+        },
+        {
+          icon: "inbox",
+          name: "inbox",
+          over: "view all",
+        },
+        {
+          icon: "book",
+          name: "Book",
+          over: "view all",
+        },
+        {
+          icon: "comment",
+          name: "Comment",
+          over: "view all",
+        },
+      ],
+      setAvatars: {
+        image:
+          "https://i.pinimg.com/originals/26/ee/73/26ee73636f3429e3df522ae219c064fd.png",
+        name: "Allie Grater",
+        gmail: "alliegrater@gamil.com",
+        listSeting: [
+          {
+            id: 1,
+            icon: "user",
+            nameset: "My Profiles",
+          },
+          {
+            id: 2,
+            icon: "book",
+            nameset: "Settings",
+          },
+          {
+            id: 3,
+            icon: "bell",
+            nameset: "Billing",
+          },
+          {
+            id: 4,
+            icon: "comment",
+            nameset: "Manage Team",
+          },
+          {
+            id: 5,
+            icon: "inbox",
+            nameset: "My Events",
+          },
+          {
+            id: 6,
+            icon: "gauge",
+            nameset: "Support Ticket",
+          },
+        ],
+      },
     };
+  },
+  mounted() {
+    // Thêm sự kiện resize để cập nhật giá trị posX khi cửa sổ thay đổi kích thước
+    window.addEventListener("resize", this.updateWindowWidth);
   },
   methods: {
     closeNavLeft() {
       this.isHidden = !this.isHidden;
       this.$emit("closeNavLeft", this.isHidden);
+    },
+    updateWindowWidth() {
+      this.posX = window.innerWidth; // Cập nhật giá trị posX khi cửa sổ thay đổi kích thước
+      this.$emit("resizeWindow", this.posX);
+    },
+    openModalLanguage() {
+      this.isActivelang = !this.isActivelang;
+    },
+    openModelSquares() {
+      this.isActiveSquares = !this.isActiveSquares;
+    },
+    openFullscreen() {
+      const elem = document.documentElement;
+      const zoomFullSc = document.querySelector(".zoomScreen");
+      const iszoomFullSc = document.querySelector(
+        ".zoomScreen.isZoomFullScreen"
+      );
+      if (iszoomFullSc && document.exitFullscreen) {
+        document.exitFullscreen();
+        zoomFullSc.classList.remove("isZoomFullScreen");
+      } else if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+        zoomFullSc.classList.add("isZoomFullScreen");
+      } else if (elem.webkitRequestFullscreen) {
+        /* Safari */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        /* IE11 */
+        elem.msRequestFullscreen();
+      }
+    },
+    openSettingAvt() {
+      this.isActiveAva = !this.isActiveAva;
     },
   },
 };
