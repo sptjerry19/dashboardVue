@@ -1,5 +1,8 @@
 <template>
-  <div class="navbar__left" :class="{ hidden: showNavLeft }">
+  <div
+    class="navbar__left transition ease-in-out dark:bg-black"
+    :class="{ hidden: showNavLeft }"
+  >
     <div class="navbar__left--listtask__and__resouces">
       <div class="navbar__left--title px-2 py-3">
         <h1 class="text-2xl">LUNO Admin</h1>
@@ -7,14 +10,13 @@
           <i
             class="cursor-pointer text-3xl hover:text-cyan-700"
             @mousemove="showCloseNav = true"
-            :class="{ hidden: showCloseNav == true }"
             ><svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-6 h-6"
+              class="w-8 h-8"
             >
               <path
                 stroke-linecap="round"
@@ -23,30 +25,27 @@
               />
             </svg>
           </i>
-          <i
-            class="cursor-pointer text-3xl hover:text-cyan-700"
+          <div
+            class="cursor-pointer absolute top-12 right-0 text-3xl bg-white py-2 px-3 shadow rounded-lg"
             :class="{ hidden: showCloseNav == false }"
-            @click="
-              {
-                (showCloseNav = true), (isHidden = true);
-              }
-            "
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75"
-              />
-            </svg>
-          </i>
+            <div class="text-lg border-b border-solid py-2 px-3">
+              Quick Actions
+            </div>
+            <div class="flex flex-col items-start border-b border-solid">
+              <h2
+                class="text-base py-1 px-3 hover:text-cyan-400"
+                v-for="(action, index) in actions"
+                :key="index"
+              >
+                {{ action.name }}
+              </h2>
+            </div>
+            <div class="text-base flex flex-col items-start px-3 py-1">
+              <h2>Invoice List</h2>
+              <h2>Create Invoice</h2>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -79,7 +78,10 @@
           </svg>
         </i>
       </div>
-      <div class="navbar__left--listtasks">
+      <div
+        class="navbar__left--listtasks dark:bg-white"
+        @mousemove="showCloseNav = false"
+      >
         <div class="flex flex-col items-start ml-5 pb-2">
           <h1>MAIN</h1>
           <p>Unique dashboard designs</p>
@@ -129,7 +131,7 @@
         </div>
       </div>
       <div
-        class="navbar__left--recources flex items-center mx-5 my-6 rounded-3xl border-dashed border border-sky-400"
+        class="navbar__left--recources dark:bg-white flex items-center mx-5 my-6 rounded-3xl border-dashed border border-sky-400"
       >
         <div class="navbar__left--listrecource ml-3 py-3">
           <div class="flex flex-col items-start ml-2 pb-1">
@@ -172,6 +174,12 @@ export default {
     return {
       isHidden: false,
       showCloseNav: false,
+      actions: [
+        { name: "Landing Pages" },
+        { name: "Inventory" },
+        { name: "eCommerce" },
+        { name: "HRMS" },
+      ],
       projects: [
         {
           id: 1,

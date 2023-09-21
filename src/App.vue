@@ -1,6 +1,10 @@
 <template>
-  <NavbarLeft :show-nav-left="isHidden" />
-  <NavbarTop :show-nav-left="isHidden" @closeNavLeft="(n) => (isHidden = n)" />
+  <NavbarLeft :show-nav-left="isHidden || posX < 1225" />
+  <NavbarTop
+    :show-nav-left="isHidden"
+    @closeNavLeft="(n) => (isHidden = n)"
+    @resizeWindow="(posx) => (posX = posx)"
+  />
 </template>
 
 <script>
@@ -17,6 +21,7 @@ export default {
     return {
       count: 1,
       isHidden: false,
+      posX: window.innerWidth,
     };
   },
 };
