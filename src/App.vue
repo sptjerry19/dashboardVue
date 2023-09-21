@@ -5,17 +5,20 @@
     @closeNavLeft="(n) => (isHidden = n)"
     @resizeWindow="(posx) => (posX = posx)"
   />
+  <ProFile />
 </template>
 
 <script>
 import NavbarTop from "./components/NavbarTop.vue";
 import NavbarLeft from "./components/NavbarLeft.vue";
+import ProFile from "./components/ProFile.vue";
 
 export default {
   name: "App",
   components: {
     NavbarTop,
     NavbarLeft,
+    ProFile,
   },
   data() {
     return {
